@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+/* ── Design tokens ─────────────────────────────────────────────────────────
+   Two themes share one set of semantic names. Components only ever use the
+   semantic colours (bg, surface, line, ink, muted, faint, accent). */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c0c0c;
+  --surface: #161616;
+  --line: #2a2a2a;
+  --ink: #ededed;
+  --muted: #a6a6a6;
+  --faint: #878787;
+  --accent: #ff7a33;
+  --on-accent: #160a03;
+  --ok: #7ad69b;
+  --bad: #ff8a75;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f2ef;
+  --surface: #e8e6e1;
+  --line: #d0cdc6;
+  --ink: #141414;
+  --muted: #555555;
+  --faint: #6a6a6a;
+  --accent: #b4450a;
+  --on-accent: #fff8f2;
+  --ok: #1c6f3e;
+  --bad: #a8371c;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-ok: var(--ok);
+  --color-bad: var(--bad);
+
+  /* Geist Sans, Mono and Pixel, self-hosted through next/font (see layout.tsx). */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display: var(--font-geist-pixel-square), var(--font-geist-mono), ui-monospace, Menlo, monospace;
+
+  --ease-out-soft: cubic-bezier(0.22, 0.8, 0.26, 1);
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    min-height: 100dvh;
+    transition: background-color 0.3s var(--ease-out-soft), color 0.3s var(--ease-out-soft);
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  button, a, summary, input, textarea { -webkit-tap-highlight-color: transparent; }
+  button { cursor: pointer; }
+  dialog { color: inherit; }
+  dialog::backdrop {
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter: blur(6px);
+  }
+  summary { cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+}
+
+@layer components {
+  /* Uppercase mono label used for metadata, section markers and hints. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.3rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    line-height: 1;
+    color: var(--muted);
+    background: var(--surface);
+  }
+
+  /* Underline that wipes in from the left on hover/focus. */
+  .wipe {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition: background-size 0.35s var(--ease-out-soft), color 0.2s;
+  }
+  a:hover .wipe, a:focus-visible .wipe, a.wipe:hover, a.wipe:focus-visible { background-size: 100% 1px; }
+
+  /* Feed rows rise in with a short stagger (index capped in markup). */
+  .rise {
+    animation: rise 0.45s var(--ease-out-soft) both;
+    animation-delay: calc(var(--i, 0) * 28ms);
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .pop { animation: pop 0.18s var(--ease-out-soft) both; }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(-4px) scale(0.985); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface) 0%, var(--line) 50%, var(--surface) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+  /* Pixel display type: uppercase, slightly open tracking. */
+  .display {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    font-weight: 500;
+  }
+
+  @keyframes shimmer {
+    to { background-position: -200% 0; }
+  }
+
+  .pulse-dot { animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse {
+    50% { opacity: 0.35; }
+  }
+
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
